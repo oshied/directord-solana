@@ -1,0 +1,14 @@
+[Unit]
+Description=Solana system tuner
+Documentation=https://docs.solana.com
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Environment="PATH=$PATH:/var/lib/solana/solana-release/bin"
+ExecStart=/var/lib/solana/solana-release/bin/solana-sys-tuner --user {{ solana_user_name }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

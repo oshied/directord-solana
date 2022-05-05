@@ -1,0 +1,22 @@
+---
+
+- jobs:
+  - ARG: solana_user_name solana
+  - ENV: PATH "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/var/lib/solana/solana-release/bin"
+  - RUN: >-
+      --run-once
+      [ -f /var/lib/solana/validator-keypair.json ] ||
+      su {{ solana_user_name }} -c
+      '/var/lib/solana/solana-release/bin/solana-keygen new -o /var/lib/solana/validator-keypair.json --no-bip39-passphrase --silent'
+
+  - RUN: >-
+      --run-once
+      [ -f /var/lib/solana/vote-account-keypair.json ] ||
+      su {{ solana_user_name }} -c
+      '/var/lib/solana/solana-release/bin/solana-keygen new -o /var/lib/solana/vote-account-keypair.json --no-bip39-passphrase --silent'
+
+  - RUN: >-
+      --run-once
+      [ -f /var/lib/solana/authorized-withdrawer-keypair.json ] ||
+      su {{ solana_user_name }} -c
+      '/var/lib/solana/solana-release/bin/solana-keygen new -o /var/lib/solana/authorized-withdrawer-keypair.json --no-bip39-passphrase --silent'

@@ -1,0 +1,34 @@
+---
+
+- jobs:
+  - ENV: CARGO_HTTP_CHECK_REVOKE false
+  - ARG: soloan_release_number 1.9.19
+  - ARG: solana_version v{{ soloan_release_number }}
+  - ARG: solana_net http://api.devnet.solana.com
+  - ARG: solana_release https://github.com/solana-labs/solana/archive/refs/tags/{{ solana_version }}.tar.gz
+  - ARG: solana_user_name solana
+  - RUN: >-
+      groupadd --system solana-application || true
+  - RUN: >-
+      echo '%solana-application ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/solana-application
+  - RUN: >-
+      adduser
+      --home-dir "/var/lib/solana"
+      --comment "Solana application user"
+      --groups solana-application,systemd-journal
+      --create-home
+      --shell /bin/bash
+      "{{ solana_user_name }}" || true
+  - RUN: wget "{{ solana_release }}" -O /var/lib/solana/solana.tgz
+  - RUN: tar xf /var/lib/solana/solana.tgz -C /var/lib/solana/
+
+  - RUN: su {{ solana_user_name }} -c 'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs -o ~/rustup.sh'
+  - RUN: su {{ solana_user_name }} -c 'bash ~/rustup.sh --profile default -y'
+  - RUN: >-
+      su {{ solana_user_name }} -c
+      '/var/lib/solana/solana-{{ soloan_release_number }}/scripts/cargo-install-all.sh /var/lib/solana/solana-release'
+
+  - RUN: su {{ solana_user_name }} -c '/var/lib/solana/solana-release/bin/solana-install init {{ solana_version }}'
+  - RUN: su {{ solana_user_name }} -c '/var/lib/solana/solana-release/bin/solana config set --url {{ solana_net }}'
+  - COPY: --blueprint files/solana-sys-tuner.service.j2 /etc/systemd/system/solana-sys-tuner.service
+  - SERVICE: --enable --restarted solana-sys-tuner.service

@@ -1,0 +1,8 @@
+---
+
+- jobs:
+  - ARG: solana_user_name solana
+  - COPY: files/solana-cachefile.yaml /var/lib/solana/solana-cachefile.yaml
+  - CACHEFILE: /var/lib/solana/solana-cachefile.yaml
+  - COPY: --blueprint files/solana-validator.service.j2 /etc/systemd/system/solana-validator.service
+  - SERVICE: --enable --restarted solana-validator.service

@@ -1,0 +1,38 @@
+{% set execstart = [
+     "/var/lib/solana/solana-release/bin/solana-validator",
+     "--log /var/lib/solana/validator.log",
+     "--identity /var/lib/solana/validator-keypair.json",
+     "--vote-account /var/lib/solana/vote-account-keypair.json",
+     "--only-known-rpc",
+     "--ledger /var/lib/solana/ledger",
+     "--rpc-port " ~ solana_rpc_port,
+     "--dynamic-port-range " ~ solana_port_range,
+     "--wal-recovery-mode skip_any_corrupted_record",
+     "--limit-ledger-size " ~ solana_ledger_size
+   ]
+%}
+{% for i in solana_known_validators %}
+{%   set _ = execstart.append("--known-validator " ~ i) %}
+{% endfor %}
+{% for i in solana_entrypoints %}
+{%   set _ = execstart.append("--entrypoint " ~ i) %}
+{% endfor %}
+[Unit]
+Description=Solana Validator
+After=network.target
+Wants=solana-sys-tuner.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User={{ solana_user_name }}
+LimitNOFILE=1000000
+LogRateLimitIntervalSec=0
+Environment="PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/var/lib/solana/solana-release/bin"
+Environment="SOLANA_METRICS_CONFIG='host=https://metrics.solana.com:8086,db={{ solana_metrics_db }},u={{ solana_metrics_user }},p={{ solana_metrics_password }}'"
+ExecStart={{ execstart | join(" ") }}
+
+[Install]
+WantedBy=multi-user.target

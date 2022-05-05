@@ -1,0 +1,20 @@
+---
+
+- jobs:
+  - ARG: solana_user_name solana
+  - ENV: PATH "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/var/lib/solana/solana-release/bin"
+  - RUN: --run-once --stdout-arg solana_validator_key cat /var/lib/solana/validator-keypair.json
+  - QUERY: solana_validator_key
+  - RUN: >-
+      echo -e "{{ query.values() | map(attribute="solana_validator_key") | select("defined") | list | first }}" | tee /var/lib/solana/validator-keypair.json
+  - RUN: su {{ solana_user_name }} -c '/var/lib/solana/solana-release/bin/solana config set --keypair /var/lib/solana/validator-keypair.json'
+
+  - RUN: --run-once --stdout-arg solana_vote_account_key cat /var/lib/solana/vote-account-keypair.json
+  - QUERY: solana_vote_account_key
+  - RUN: >-
+      echo -e "{{ query.values() | map(attribute="solana_vote_account_key") | select("defined") | list | first }}" | tee /var/lib/solana/vote-account-keypair.json
+
+  - RUN: --run-once --stdout-arg solana_authorized_withdrawer cat /var/lib/solana/authorized-withdrawer-keypair.json
+  - QUERY: solana_authorized_withdrawer
+  - RUN: >-
+      echo -e "{{ query.values() | map(attribute="solana_authorized_withdrawer") | select("defined") | list | first }}" | tee /var/lib/solana/authorized-withdrawer-keypair.json

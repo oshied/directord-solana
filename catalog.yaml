@@ -1,0 +1,42 @@
+---
+
+directord_server:
+  args:
+    port: 22
+    username: cloud-user
+  targets:
+  - host: 10.0.10.151
+  jobs:
+  - RUN: curl https://raw.githubusercontent.com/oshied/directord/main/tools/dev-setup.sh | sudo DRIVER=zeromq bash
+  - RUN: sudo /opt/directord/bin/directord-server-systemd
+  - RUN: sudo systemctl daemon-reload
+  - RUN: sudo systemctl enable directord-server.service
+  - RUN: sudo systemctl restart directord-server.service
+
+directord_clients:
+  args:
+    port: 22
+    username: cloud-user
+  targets:
+  - host: 10.0.10.83
+  - host: 10.0.10.97
+  - host: 10.0.10.158
+  - host: 10.0.10.203
+  jobs:
+  - RUN: curl https://raw.githubusercontent.com/oshied/directord/main/tools/dev-setup.sh | sudo DRIVER=zeromq bash
+  - RUN: sudo /opt/directord/bin/directord-client-systemd
+  - RUN: |-
+      sudo python3 <<EOC
+      import yaml
+      try:
+          with open('/etc/directord/config.yaml') as f:
+              config = yaml.safe_load(f)
+      except FileNotFoundError:
+          config = dict()
+      config['zmq_server_address'] = "{{ directord_server['targets'][0]['host'] }}"
+      with open('/etc/directord/config.yaml', 'w') as f:
+          f.write(yaml.safe_dump(config, default_flow_style=False))
+      EOC
+  - RUN: sudo systemctl daemon-reload
+  - RUN: sudo systemctl enable directord-client.service
+  - RUN: sudo systemctl restart directord-client.service

@@ -1,0 +1,14 @@
+---
+solana_ledger_size: 50000000
+solana_metrics_user: scratch_writer
+solana_metrics_password: topsecret
+solana_metrics_db: devnet
+solana_known_validators:
+- dv1ZAGvdsz5hHLwWXsVnM94hWf1pjbKVau1QVkaMJ92  # operated by Solana Labs
+- dv2eQHeP4RFrJZ6UeiZWoc3XTtmtZCUKxxCApCDcRNV  # operated by Solana Labs
+- dv4ACNkpYPcE3aKmYDqZm9G5EB3J4MRoeE7WNDRBVJB  # operated by Solana Labs
+- dv3qDFk1DTF36Z62bNvrCXe9sKATA6xvVy6A798xxAS  # operated by Solana Labs
+solana_entrypoints:
+- entrypoint.devnet.solana.com:8001
+solana_rpc_port: 8899
+solana_port_range: 8000-8020

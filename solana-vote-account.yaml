@@ -1,0 +1,11 @@
+---
+
+- jobs:
+  - ARG: solana_user_name solana
+  - ENV: PATH "/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/var/lib/solana/solana-release/bin"
+  - RUN: >-
+      --run-once su {{ solana_user_name }} -c
+      '/var/lib/solana/solana-release/bin/solana create-vote-account
+      /var/lib/solana/vote-account-keypair.json
+      /var/lib/solana/validator-keypair.json
+      /var/lib/solana/authorized-withdrawer-keypair.json'

@@ -1,0 +1,6 @@
+---
+
+- jobs:
+  - RUN: dnf install -y wget
+  - RUN: sed -i 's@SELINUX=enforcing@SELINUX=permissive@' /etc/selinux/config
+  - RUN: setenforce 0

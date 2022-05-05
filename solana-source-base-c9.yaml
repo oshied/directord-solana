@@ -1,0 +1,6 @@
+---
+
+- jobs:
+  - RUN: dnf install -y systemd-devel openssl-devel cmake perl llvm wget
+  - RUN: sed -i 's@SELINUX=enforcing@SELINUX=permissive@' /etc/selinux/config
+  - RUN: setenforce 0
